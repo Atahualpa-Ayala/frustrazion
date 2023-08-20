@@ -1,0 +1,140 @@
+---
+title: "An In-depth Analysis of Income: Examining the Past, Present, and Future Scenarios"
+author: "Atahualpa Ayala"
+format: html
+editor: visual
+output:
+  warn: false
+---
+
+## Introduction
+
+The current exercise aims to encourage learners to introspect into their economic lives. At times, individuals may feel that they are not achieving their goals, when in fact they are making progress, albeit at a slower pace, the expectation or fantasy versus the reality. The intention is to inspire learners to utilize data science for analyzing their own economic accomplishments and personal growth from a different perspective -- a cool yet objective data-driven viewpoint. We urge participants to transcend their personal biases through a comprehensive assessment.
+
+## Methodoloy
+
+The main objective of the following exercises is to make use of RStudio for analysis of the "Frustrazion" table, which contains the income history of a hypothetical learner experiencing frustration fue to their income situation.
+
+We are going to use the following packages:
+
+-   here
+-   tidyverse
+
+remember that tidyverse is a collection of several packages: ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr and forcats.
+
+### Load the necessary libraries
+
+```{r, message=FALSE}
+library(here)
+library(tidyverse)
+```
+
+### Load the frustrazion table
+
+Remember to :
+
+1.  Save the email attachment that content the table.
+
+2.  Load the frustrazion table using the package Here.
+
+```{r}
+frustrazion <- read.csv(here("data", "frustrazion.csv"))
+```
+
+### Exploring your frustazion table
+
+1.  To view the first few rows of the data frame: head(data)
+2.  To view the last few rows of the data frame: tail(data)
+3.  To view a random sample of rows: sample_n(data, n)
+
+```{r}
+#check the fist 6 rows 
+
+head(frustrazion)
+
+#check the last 6 tows 
+
+
+
+#view a random sample of rows
+
+
+```
+
+### Data structure
+
+1. To see the structure of the data frame (column types, dimensions): str(data)
+2. To get the dimensions of the data frame: dim(data)
+3. To get the names of columns: names(data)
+
+```{r}
+
+```
+
+### Some data processing
+1. To calculate the tax value based on a 10% IVA 
+2. To calculate the net income
+
+```{r}
+# Calculate the tax value based on 10% IVA
+frustrazion <- frustrazion|>
+  mutate(tax = case_when(
+    ano == 2021 ~ 0,
+    TRUE ~  ingresos_neto/11
+    ))
+
+
+# Calculate the net income
+frustrazion <- frustrazion|>
+  mutate(net_income = case_when(
+    ano == 2021 ~ ingresos_neto,
+    TRUE ~  ingresos_neto-tax
+    ))
+
+# change the month to a numneric
+
+#create a vector with the number of the months
+month_mapping <- c( enero = 1, febrero = 2, marzo = 3, abril = 4, 
+                    mayo = 5, junio = 6,  julio = 7, agosto = 8, 
+                    septiembre = 9, octubre = 10, noviembre = 11, diciembre = 12)
+#make a substitution
+frustrazion <- frustrazion|>
+  mutate(month = month_mapping[mes])
+  
+# Combine year and month into a continuous time variable
+frustrazion <- frustrazion|>  
+  mutate(date = as.Date(paste(ano, month, "01", sep = "-")))
+
+```
+
+
+
+### Summary Statistics
+1. To get summary statistics for numerical columns: summary(data)
+2. To compute column means: colMeans(data)
+3. To compute column medians: sapply(data, median)
+
+```{r}
+
+```
+
+### Data Visualization
+
+```{r}
+plot_income <- ggplot(frustrazion, aes(date))+
+  geom_point(aes(y = net_income), color = "green") +
+  geom_line(aes(y = net_income), color = "green") +
+  geom_point(aes(y = ingresos_neto), color = "blue") +
+  geom_line(aes(y = ingresos_neto), color = "blue",linetype = "dashed") +
+  geom_point(aes(y = tax), color = "red") +
+  geom_line(aes(y = tax), color = "red") +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Income Progress Over Months",
+    x = "Date",
+    y = "Net Income"
+  )
+
+print(plot_income)
+```
+
